@@ -1,10 +1,7 @@
 import numpy as np
-from typing import List
 import warnings
-
-
-def sigmoid(x):
-    return 1/(1 + np.exp(-x))
+from typing import List
+from activations import sigmoid, relu, tanh, softmax
 
 
 class Neuron():
@@ -26,10 +23,10 @@ class Dense:
     # Xavier-Glorot Uniform Initialization
     def _uniform_xavier_init(self):
             a = np.sqrt(6/(self.units + self.input_shape))
-            layer_weight_matrix = np.random.uniform(low=-a, high=a, size=(self.units, self.input_shape))
+            self.layer_weight_matrix = np.random.uniform(low=-a, high=a, size=(self.units, self.input_shape))
 
             for i in range(self.units):
-                self.layer[i].weights = layer_weight_matrix[i].reshape(self.input_shape, 1)
+                self.layer[i].weights = self.layer_weight_matrix[i].reshape(self.input_shape, 1)
                 self.layer[i].bias = 0
 
     # Check the weights and biases of each Neuron in Dense layer
@@ -37,9 +34,31 @@ class Dense:
         for i in range(self.units):
             print(f"For {i+1}th Neuron: w = {self.layer[i].weights}, b = {self.layer[i].bias}")
 
+    def forward(self, input: np.ndarray) -> np.ndarray:
+        output = np.dot(self.layer_weight_matrix, input) + np.array([self.layer[i].bias for i in range(self.units)]).reshape(self.units, 1)
+        
+        if self.activation == "sigmoid":
+            return sigmoid(output)
+        
+        elif self.activation == "relu":
+            return relu(output)
+        
+        elif self.activation == "tanh":
+            return tanh(output)
+        
+        elif self.activation == "softmax":
+            return softmax(output)
+        
+        else:
+            raise ValueError("Only sigmoid, tanh, softmax and ReLU activation functions are supported for now :(")
+
+
+
 
 # FLAW: the input_shape param will be defined only for the first Dense layer in the Model(List[Dense])
 class Model():
+    layer_pointer = 0
+
     def __init__(self, layers: List[Dense], loss: str):
         
         if not layers:
@@ -64,12 +83,19 @@ class Model():
                 # Hacky, but since input_shape was None, I couldn't init the params for other Dense Layers earlier
                 self.layers[i]._uniform_xavier_init()
 
-    ### Now going to implement:-
-    ### Forward_Prop
+
+    def forward_prop(self, input: np.ndarray) -> np.ndarray:
+        output = input
+        for layer in self.layers:
+            output = layer.forward(output)
+        return output
+        
     ### Backward_Prop
     ### loss
 
-    def train(self, epochs: int, learning_rate: float):
+    # Batch size = 1, Stochastic G.D. for simplicity
+    # note: epoch = training the NN on all batches once
+    def train(self, initial_input: np.ndarray, epochs: int, learning_rate: float):
         pass
 
 # dense_layer_1 = Dense(units=32, activation="sigmoid", input_shape=2)
