@@ -2,6 +2,20 @@ import numpy as np
 import warnings
 from typing import List
 from activations import sigmoid, relu, tanh, softmax
+from loss import MSE
+
+
+activation_functions = {
+    "sigmoid": sigmoid,
+    "relu": relu,
+    "tanh": tanh,
+    "softmax": softmax
+}
+
+
+loss_functions = {
+    "MSE": MSE,
+}
 
 
 class Neuron():
@@ -27,7 +41,9 @@ class Dense:
 
             for i in range(self.units):
                 self.layer[i].weights = self.layer_weight_matrix[i].reshape(self.input_shape, 1)
-                self.layer[i].bias = 0
+
+            self.layer_biases = np.zeros((self.units, 1), dtype=np.float64)
+
 
     # Check the weights and biases of each Neuron in Dense layer
     def spit_weights(self):
@@ -35,31 +51,32 @@ class Dense:
             print(f"For {i+1}th Neuron: w = {self.layer[i].weights}, b = {self.layer[i].bias}")
 
     def forward(self, input: np.ndarray) -> np.ndarray:
-        output = np.dot(self.layer_weight_matrix, input) + np.array([self.layer[i].bias for i in range(self.units)]).reshape(self.units, 1)
-        
+        output = np.dot(self.layer_weight_matrix, input) + self.layer_biases
         if self.activation == "sigmoid":
+
+            # Need to store Z, A for each layer
+            self.cache = [output, sigmoid(output)]
             return sigmoid(output)
         
         elif self.activation == "relu":
+            self.cache = [output, relu(output)]
             return relu(output)
         
         elif self.activation == "tanh":
+            self.cache = [output, tanh(output)]
             return tanh(output)
         
         elif self.activation == "softmax":
+            self.cache = [output, softmax(output)]
             return softmax(output)
         
         else:
             raise ValueError("Only sigmoid, tanh, softmax and ReLU activation functions are supported for now :(")
 
 
-
-
 # FLAW: the input_shape param will be defined only for the first Dense layer in the Model(List[Dense])
 class Model():
-    layer_pointer = 0
-
-    def __init__(self, layers: List[Dense], loss: str):
+    def __init__(self, layers: List[Dense], loss: str, learning_rate: float):
         
         if not layers:
             raise ValueError("Sequential model must contain at least one layer.")
@@ -72,6 +89,7 @@ class Model():
 
         self.layers = layers
         self.loss = loss
+        self.learning_rate = learning_rate
         self._chain_input_shapes()
 
     # the dimension of the output vector for a layer is the same as the number of neurons in the layer
@@ -90,23 +108,75 @@ class Model():
             output = layer.forward(output)
         return output
         
-    ### Backward_Prop
-    ### loss
 
+    def backward_prop(self, original_input: np.ndarray, prediction: np.ndarray, target: np.ndarray):
+        dL_da = loss_functions[self.loss](prediction, target, deriv=True)
+
+        for i in reversed(range(len(self.layers))):
+            layer = self.layers[i]
+            activation = activation_functions[layer.activation]
+
+            z = layer.cache[0]
+            a = layer.cache[1]
+
+            da_dz = activation(z, deriv=True)
+            dL_dz = dL_da*da_dz
+
+            a_prev = self.layers[i-1].cache[1] if i > 0 else original_input
+            dL_dw = np.dot(dL_dz, a_prev.T)
+            dL_db = dL_dz
+
+            layer.layer_weight_matrix -= (self.learning_rate*dL_dw)
+            layer.layer_biases -= self.learning_rate*dL_db
+
+            dL_da = np.dot(layer.layer_weight_matrix.T, dL_dz)
+            
     # Batch size = 1, Stochastic G.D. for simplicity
     # note: epoch = training the NN on all batches once
-    def train(self, initial_input: np.ndarray, epochs: int, learning_rate: float):
-        pass
+    def train(self, initial_input: np.ndarray, target_output: np.ndarray, epochs: int):
+        for _ in range(epochs):
+            for training_example, target_example in zip(initial_input, target_output):
+                training_example = training_example.reshape(initial_input.shape[1],1)
+                target_example = target_example.reshape(target_output.shape[1],1)
 
-# dense_layer_1 = Dense(units=32, activation="sigmoid", input_shape=2)
-# dense_layer_1.spit_weights()
+                # input is expected to be a column matrix in the forward() function but, training data will have to be broken into rows
+                self.backward_prop(training_example, self.forward_prop(training_example), target_example)
+
+
+    def predict(self, X: np.ndarray):
+        return self.forward_prop(X)
+
+
+########################################################################
+# XOR inputs and labels
+X = np.array([[0, 0],
+              [0, 1],
+              [1, 0],
+              [1, 1]])
+
+Y = np.array([[0],
+              [1],
+              [1],
+              [0]])
+
+# print(X.shape)
+# print(Y.shape)
+########################################################################
 
 model = Model(
     [
-    Dense(units=10, activation="sigmoid", input_shape=5),
-    Dense(units=2, activation="softmax")], 
-    loss="placeholder"
+        Dense(units=10, activation="sigmoid", input_shape=2),
+        Dense(units=4, activation="sigmoid"),
+        Dense(units=1, activation="sigmoid")
+    ],
+    loss="MSE",
+    learning_rate=0.01
     )
 
-for layer in model.layers:
-    layer.spit_weights()
+
+model.train(X, Y, 100000)
+
+print(model.predict(np.array([[0], [0]])))
+print(model.predict(np.array([[0], [1]])))
+print(model.predict(np.array([[1], [0]])))
+print(model.predict(np.array([[1], [1]])))
