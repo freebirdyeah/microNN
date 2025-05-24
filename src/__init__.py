@@ -1,5 +1,4 @@
-from .model import Model
-from .layers import Dense
+from .model import Model, Dense
 from .activations import sigmoid, relu, tanh, softmax
 from .loss import MSE
 
