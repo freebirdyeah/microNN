@@ -10,10 +10,11 @@ Trains XOR in 100k epochs in little under 1min.</h4>
 ## Download it!
 
 - `git clone https://github.com/freebirdyeah/microNN/`
-- cd microNN/
-- pip install -e .
+- `cd microNN/`
+- `pip install -e`
 
 <h4 >To uninstall:- </h4>
+
 - `pip uninstall micronn`
 
 ## Features
