@@ -3,7 +3,6 @@ import warnings
 from typing import List
 from activations import sigmoid, relu, tanh, softmax
 from loss import MSE
-from sklearn.datasets import load_iris
 
 
 activation_functions = {
