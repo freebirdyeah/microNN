@@ -10,7 +10,7 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
  
  - manual differentiation and batch size = 1 for now.
 
-Trains XOR in 100k epochs in little under 1min.
+ -  Trains XOR in 100k epochs in little under 1min.
 </h3>
 
 ## Download it!
