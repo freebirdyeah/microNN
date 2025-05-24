@@ -3,6 +3,7 @@ import warnings
 from typing import List
 from activations import sigmoid, relu, tanh, softmax
 from loss import MSE
+from sklearn.datasets import load_iris
 
 
 activation_functions = {
@@ -134,49 +135,34 @@ class Model():
     # Batch size = 1, Stochastic G.D. for simplicity
     # note: epoch = training the NN on all batches once
     def train(self, initial_input: np.ndarray, target_output: np.ndarray, epochs: int):
-        for _ in range(epochs):
-            for training_example, target_example in zip(initial_input, target_output):
-                training_example = training_example.reshape(initial_input.shape[1],1)
-                target_example = target_example.reshape(target_output.shape[1],1)
+        
+        if initial_input.ndim == 1:
+            initial_input = initial_input.reshape(-1, 1)
+        if target_output.ndim == 1:
+            target_output = target_output.reshape(-1, 1)
 
-                # input is expected to be a column matrix in the forward() function but, training data will have to be broken into rows
-                self.backward_prop(training_example, self.forward_prop(training_example), target_example)
+        for epoch in range(epochs):
+            total_loss = 0  # Accumulate loss for this epoch
+
+            for training_example, target_example in zip(initial_input, target_output):
+                training_example = training_example.reshape(initial_input.shape[1], 1)
+                target_example = target_example.reshape(target_output.shape[1], 1)
+
+                prediction = self.forward_prop(training_example)
+                self.backward_prop(training_example, prediction, target_example)
+
+                training_sample_loss = loss_functions[self.loss](prediction, target_example, deriv=False)
+                total_loss += training_sample_loss
+
+            average_loss = total_loss / len(initial_input)
+
+            if epoch % (epochs // 10) == 0:
+                print(f"Epoch {epoch}/{epochs} | Avg Loss: {average_loss:.4f} ...")
 
 
     def predict(self, X: np.ndarray):
+        # X always need to be a col vector of (input_shape, 1)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        
         return self.forward_prop(X)
-
-
-########################################################################
-# XOR inputs and labels
-X = np.array([[0, 0],
-              [0, 1],
-              [1, 0],
-              [1, 1]])
-
-Y = np.array([[0],
-              [1],
-              [1],
-              [0]])
-
-# print(X.shape)
-# print(Y.shape)
-########################################################################
-
-model = Model(
-    [
-        Dense(units=10, activation="sigmoid", input_shape=2),
-        Dense(units=4, activation="sigmoid"),
-        Dense(units=1, activation="sigmoid")
-    ],
-    loss="MSE",
-    learning_rate=0.01
-    )
-
-
-model.train(X, Y, 100000)
-
-print(model.predict(np.array([[0], [0]])))
-print(model.predict(np.array([[0], [1]])))
-print(model.predict(np.array([[1], [0]])))
-print(model.predict(np.array([[1], [1]])))

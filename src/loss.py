@@ -6,3 +6,4 @@ def MSE(prediction: np.ndarray, output: np.ndarray, deriv=False) -> np.ndarray:
         return 0.5*np.mean(np.square((prediction - output)))
     else:
         return prediction - output
+    
