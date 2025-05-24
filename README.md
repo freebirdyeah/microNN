@@ -5,7 +5,9 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
 
 <h3>> 
  ⚠️ This is a quick built-in-a-weekend implementation — so don't judge too much ;) 
+ 
  - Only supports sigmoid, ReLU, tanh, softmax(untested) activations, MSE loss
+ 
  - manual differentiation and batch size = 1 for now.
 
 Trains XOR in 100k epochs in little under 1min.
