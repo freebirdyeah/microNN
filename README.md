@@ -3,9 +3,13 @@ a barebones implementation for training feedforward NNs from scratch.
 
 Built in a weekend to understand the flow (and pain) of building a mini-NN framework.
 
-<h4>> ⚠️ This is a quick built-in-a-weekend-library — DEFO not something ready for proper FFNN training. Only supports sigmoid, ReLU, tanh, softmax(untested) activations, MSE loss; manual differentiation and batch size = 1 for now.
+<h3>> 
+ ⚠️ This is a quick built-in-a-weekend implementation — so don't judge too much ;) 
+ - Only supports sigmoid, ReLU, tanh, softmax(untested) activations, MSE loss
+ - manual differentiation and batch size = 1 for now.
 
-Trains XOR in 100k epochs in little under 1min.</h4>
+Trains XOR in 100k epochs in little under 1min.
+</h3>
 
 ## Download it!
 
