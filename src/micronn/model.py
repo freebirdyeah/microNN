@@ -1,8 +1,8 @@
 import numpy as np
 import warnings
 from typing import List
-from activations import sigmoid, relu, tanh, softmax
-from loss import MSE
+from .activations import sigmoid, relu, tanh, softmax
+from .loss import MSE
 
 
 activation_functions = {
