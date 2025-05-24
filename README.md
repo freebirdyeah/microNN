@@ -17,7 +17,7 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
 
 - `git clone https://github.com/freebirdyeah/microNN/`
 - `cd microNN/`
-- `pip install -e`
+- `pip install -e .`
 
 <h4 >To uninstall:- </h4>
 
