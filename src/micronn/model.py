@@ -45,33 +45,17 @@ class Dense:
             self.layer_biases = np.zeros((self.units, 1), dtype=np.float64)
 
 
-    # Check the weights of each Neuron in Dense layer
-    # Neuron class isn't really used tbh, might remove it later
+    # Check the weights and biases of each Neuron in Dense layer
     def spit_weights(self):
         for i in range(self.units):
-            print(f"For {i+1}th Neuron: w = {self.layer[i].weights}")
+            print(f"For {i+1}th Neuron: w = {self.layer[i].weights}, b = {self.layer[i].bias}")
 
     def forward(self, input: np.ndarray) -> np.ndarray:
-        output = np.dot(self.layer_weight_matrix, input) + self.layer_biases
-        if self.activation == "sigmoid":
-
-            # Need to store Z, A for each layer for backprop
-            self.cache = [output, sigmoid(output)]
-            return sigmoid(output)
-        
-        elif self.activation == "relu":
-            self.cache = [output, relu(output)]
-            return relu(output)
-        
-        elif self.activation == "tanh":
-            self.cache = [output, tanh(output)]
-            return tanh(output)
-        
-        elif self.activation == "softmax":
-            self.cache = [output, softmax(output)]
-            return softmax(output)
-        
-        else:
+        try:
+            output = np.dot(self.layer_weight_matrix, input) + self.layer_biases
+            self.cache = [output, activation_functions[self.activation](output)]
+            return activation_functions[self.activation](output)
+        except:
             raise ValueError("Only sigmoid, tanh, softmax and ReLU activation functions are supported for now :(")
 
 
