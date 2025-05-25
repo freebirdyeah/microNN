@@ -29,13 +29,14 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
 - MSE loss
 - Stochastic Gradient Descent (`batch_size` = 1)
 
-## Near Goals
+## Roadmap
+### Near 
 - more testing (especially with softmax)
 - add mini-batch gradient descent
 - automatic one-hot-encoding on arrays of boolean values
 - add CategoricalCrossEntropy Loss function
  
-## Future Goals
+### Future 
 - Add an optimizer like `Adam`
 - maybe think about adding an autograd engine in the future
 
@@ -45,7 +46,6 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
 import numpy as np
 from micronn import Model, Dense
 
-
 X = np.array([
     [0, 0],
     [1, 1],
@@ -53,12 +53,10 @@ X = np.array([
     [1, 0]
 ])
 
-
 Y = np.array([[0], 
               [0], 
               [1], 
               [1]])
-
 
 model = Model(
     layers=[
@@ -70,29 +68,9 @@ model = Model(
 )
 
 model.train(X, Y, epochs=100_000)
-
 example_test = np.array([0, 1])
 
 # rounding to 0/1
 prediction = np.round(model.predict(example_test))
 print(prediction)
-```
-
-<h3>Output:-</h3>
-
-```
-UserWarning: INPUT_SHAPE PARAMETER VALUE PROVIDED FOR ALL DENSE LAYERS EXCEPT THE FIRST WILL BE OVERIDDEN!
-  warnings.warn("INPUT_SHAPE PARAMETER VALUE PROVIDED FOR ALL DENSE LAYERS EXCEPT THE FIRST WILL BE OVERIDDEN!")
-
-Epoch 0/100000 | Avg Loss: 0.1333 ...
-Epoch 10000/100000 | Avg Loss: 0.1185 ...
-Epoch 20000/100000 | Avg Loss: 0.0833 ...
-Epoch 30000/100000 | Avg Loss: 0.0291 ...
-Epoch 40000/100000 | Avg Loss: 0.0084 ...
-Epoch 50000/100000 | Avg Loss: 0.0039 ...
-Epoch 60000/100000 | Avg Loss: 0.0024 ...
-Epoch 70000/100000 | Avg Loss: 0.0016 ...
-Epoch 80000/100000 | Avg Loss: 0.0012 ...
-Epoch 90000/100000 | Avg Loss: 0.0010 ...
-[[1.]]
 ```
