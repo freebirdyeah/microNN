@@ -45,16 +45,17 @@ class Dense:
             self.layer_biases = np.zeros((self.units, 1), dtype=np.float64)
 
 
-    # Check the weights and biases of each Neuron in Dense layer
+    # Check the weights of each Neuron in Dense layer
+    # Neuron class isn't really used tbh, might remove it later
     def spit_weights(self):
         for i in range(self.units):
-            print(f"For {i+1}th Neuron: w = {self.layer[i].weights}, b = {self.layer[i].bias}")
+            print(f"For {i+1}th Neuron: w = {self.layer[i].weights}")
 
     def forward(self, input: np.ndarray) -> np.ndarray:
         output = np.dot(self.layer_weight_matrix, input) + self.layer_biases
         if self.activation == "sigmoid":
 
-            # Need to store Z, A for each layer
+            # Need to store Z, A for each layer for backprop
             self.cache = [output, sigmoid(output)]
             return sigmoid(output)
         
