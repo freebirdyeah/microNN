@@ -13,7 +13,7 @@ Built in a weekend to understand the flow (and pain) of building a mini-NN frame
  -  Trains XOR in 100k epochs in ~20sec
 </h3>
 
-## Download it!
+## Installation
 
 - `git clone https://github.com/freebirdyeah/microNN/`
 - `cd microNN/`
